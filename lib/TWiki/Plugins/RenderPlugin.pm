@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-# Copyright (C) 2008 Michael Daum http://michaeldaumconsulting.com
+# Copyright (C) 2008-2009 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,14 +16,15 @@
 package TWiki::Plugins::RenderPlugin;
 
 require TWiki::Func;
+require TWiki::Sandbox;
 use strict;
 
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $NO_PREFS_IN_TOPIC );
 
 $VERSION = '$Rev$';
-$RELEASE = '0.1';
+$RELEASE = '1.0';
 
-$SHORTDESCRIPTION = 'Render <nop>TWikiApplications asynchronously';
+$SHORTDESCRIPTION = 'Render <nop>WikiApplications asynchronously';
 $NO_PREFS_IN_TOPIC = 1;
 
 use constant DEBUG => 0; # toggle me
@@ -41,6 +42,7 @@ sub initPlugin {
   TWiki::Func::registerRESTHandler('tag', \&restTag);
   TWiki::Func::registerRESTHandler('expand', \&restExpand);
   TWiki::Func::registerRESTHandler('render', \&restRender);
+  TWiki::Func::registerRESTHandler('upload', \&restUpload);
 
   return 1;
 }
@@ -80,6 +82,8 @@ sub restExpand {
 sub restTag {
   my ($session, $subject, $verb) = @_;
 
+  #writeDebug("called restTag($subject, $verb)");
+
   # get params
   my $query = TWiki::Func::getCgiQuery();
   my $theTag = $query->param('name') || 'INCLUDE';
@@ -94,10 +98,10 @@ sub restTag {
 
   # construct parameters for tag
   my $params = $theDefault?'"'.$theDefault.'"':'';
-  my %params = $query->Vars();
-  foreach my $key (keys %params) {
+  foreach my $key ($query->param()) {
     next if $key =~ /^(name|param|topic|XForms:Model)$/;
-    $params .= ' '.$key.'="'.$params{$key}.'" ';
+    my $value = $query->param($key);
+    $params .= ' '.$key.'="'.$value.'" ';
   }
 
   # create TML expression
@@ -116,6 +120,95 @@ sub restTag {
   #writeDebug("result=$result");
 
   return $result;
+}
+
+###############################################################################
+sub restUpload {
+  my ($session, $subject, $verb) = @_;
+
+  my $query = TWiki::Func::getCgiQuery();
+  my $topic = $query->param('topic');
+  my $web;
+
+  ($web, $topic) = TWiki::Func::normalizeWebTopicName("", $topic);
+
+  my $hideFile = $query->param('hidefile') || '';
+  my $fileComment = $query->param('filecomment') || '';
+  my $createLink = $query->param('createlink') || '';
+  my $doPropsOnly = $query->param('changeproperties');
+  my $filePath = $query->param('filepath') || '';
+  my $fileName = $query->param('filename') || '';
+  if ($filePath && ! $fileName) {
+      $filePath =~ m|([^/\\]*$)|;
+      $fileName = $1;
+  }
+  $fileComment =~ s/\s+/ /go;
+  $fileComment =~ s/^\s*//o;
+  $fileComment =~ s/\s*$//o;
+  $fileName =~ s/\s*$//o;
+  $filePath =~ s/\s*$//o;
+
+  unless (TWiki::Func::checkAccessPermission(
+      'CHANGE', TWiki::Func::getWikiName(), undef, $topic, $web)) {
+      return "Access denied";
+  }
+
+  my ($fileSize, $fileDate, $tmpFileName);
+
+  my $stream = $query->upload('filepath') unless $doPropsOnly;
+  my $origName = $fileName;
+
+  unless($doPropsOnly) {
+      # SMELL: call to unpublished function
+      ($fileName, $origName) =
+        TWiki::Sandbox::sanitizeAttachmentName($fileName);
+
+      # check if upload has non zero size
+      if($stream) {
+          my @stats = stat $stream;
+          $fileSize = $stats[7];
+          $fileDate = $stats[9];
+      }
+
+      unless($fileSize && $fileName) {
+          return "Zero-sized file upload";
+      }
+
+      my $maxSize = TWiki::Func::getPreferencesValue(
+          'ATTACHFILESIZELIMIT');
+      $maxSize = 0 unless ($maxSize =~ /([0-9]+)/o);
+
+      if ($maxSize && $fileSize > $maxSize * 1024) {
+          return "Oversized upload";
+      }
+  }
+
+  # SMELL: use of undocumented CGI::tmpFileName
+  my $tfp = $query->tmpFileName($query->param('filepath'));
+  my $dontlog = $Foswiki::cfg{Log}{upload};
+  $dontlog = $TWiki::cfg{Log}{upload} unless defined $dontlog;
+  my $error = TWiki::Func::saveAttachment(
+      $web, $topic, $fileName,
+      {
+          dontlog => !$dontlog,
+          comment => $fileComment,
+          hide => $hideFile,
+          createlink => $createLink,
+          stream => $stream,
+          filepath => $filePath,
+          filesize => $fileSize,
+          filedate => $fileDate,
+          tmpFilename => $tfp,
+      });
+
+  close($stream) if $stream;
+
+  return $error if $error;
+
+  # Otherwise allow the rest dispatcher to write a 200
+  return 
+    "$origName attached to $web.$topic" . 
+    ($origName ne $fileName ?" as $fileName" : '');
 }
 
 1;

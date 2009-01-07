@@ -1,8 +1,8 @@
-%META:TOPICINFO{author="micha" date="1215778439" format="1.1" reprev="1.2" version="1.2"}%
+%META:TOPICINFO{author="ProjectContributor" date="1215778439" format="1.1" reprev="1.2" version="$Rev$"}%
 ---+!! %TOPIC%
 <!--
 One line description, required for extensions repository catalog.
-   * Set SHORTDESCRIPTION = Render <nop>TWikiApplications asynchronously
+   * Set SHORTDESCRIPTION = Render <nop>WikiApplications asynchronously
 -->
 %SHORTDESCRIPTION%
 
@@ -12,19 +12,19 @@ One line description, required for extensions repository catalog.
 <table style="float:right">
 <tr>
   <td><img src="%ATTACHURLPATH%/wikiringlogo40x40.png" title="Make your Wiki ring!" alt="WikiRing"></td>
-  <td><a href="http://wikiring.de" title="Make your Wiki ring!" style="text-decoration:none">
+  <td><a href="http://wikiring.com" title="Make your Wiki ring!" style="text-decoration:none">
       Powered by <br /> <nop>WikiRing Consultants </a>
   </td>
 </tr>
 </table>
-This plugin implements three simple REST handlers to get content from TWiki.
+This plugin implements three simple REST handlers to get content from Foswiki.
 For example, these can be used to easily replace a server-side INCLUDE with a
 functinal equivalent using an ajax call to one of these REST handlers. 
 
 This comes in handy to asynchronously load content in a tabbed interface,
 loading subsequent content for a treeview, a menu widget or tooltips.
 
-You may also use it to just render a snippet of <nop>TWikiMarkup 
+You may also use it to just render a snippet of <nop>TopicMarkup 
 on the server and return a HTML preview back to the browser.
 
 The REST handlers of this plugin have been designed rather generic.
@@ -38,22 +38,22 @@ error cases on the server side in much more detail.
 
 The advantage of using this plugin's REST handler is, that you don't have
 to implement service backends using perl. Instead, you can write <nop>TopicFunctions
-that contain the <nop>TWikiApplication to be executed when it is called by an
+that contain the <nop>WikiApplication to be executed when it is called by an
 appropriate ajax request. This basically is the client side equivalent of
-a parametrized =INCLUDE= as it is used on server side <nop>TWikiApplications (see examples below).
+a parametrized =INCLUDE= as it is used on server side <nop>WikiApplications (see examples below).
 
 ---++ Syntax
 The available REST handlers are:
 
 | *Handler* | *Parameters* | *Description* |
 | =expand= | =text= | expands common variables in the submitted =text= fragment |
-| =render= | =text= | same as =expand= but also renders <nop>TWikiMarkup converting it to HTML |
+| =render= | =text= | same as =expand= but also renders <nop>TopicMarkup converting it to HTML |
 | =tag= | =name=, %BR% =param=, %BR% =<named-params>*=, %BR% =render= | this is a convenience function to expand one specific \
-  <nop>TWikiVariable instead of having to build up a snippet of TWiki code that you want to =expand= or =render=; \
+  variable instead of having to build up a snippet of code that you want to =expand= or =render=; \
   The =param= parameter specifies the default parameters to this tag; the =named-params= are additional \
   named parameters; the =render= flag indicates if the result is to be expanded only (see =expand=) \
   or if it should be renderd into HTML; default is off, that is only expand common tags but don't interpret \
-  <nop>TWikiMarkup |
+  <nop>TopicMarkup |
 
 ---++ Usage
 The REST handlers are called like this:
@@ -142,15 +142,14 @@ Okay, your turn to create an example calling SEARCH.
 
 ---++ Plugin Info
 
-|  Plugin Author: | TWiki:Main.MichaelDaum |
-|  Copyright &copy;: | 2006-2008, Michael Daum http://michaeldaumconsulting.com |
+|  Plugin Author: | Michael Daum |
+|  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 0.1 |
+|  Plugin Version: | 1.0 |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  07 Jan 2009: | added upload rest handler; \
+                  fixes for foswiki and <nop>FastCGIContrib |
 |  11 Jul 2008: | initial version |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Plugin Home: | Foswiki:Extensions/%TOPIC% |
-|  Feedback: | TWiki:lugins/%TOPIC%Dev |
-|  Appraisal: | TWiki:lugins/%TOPIC%Appraisal |
-
-<!-- Do _not_ attempt to edit this topic; it is auto-generated. Please add comments/questions/remarks to the feedback topic on twiki.org instead. -->
+|  Feedback: | Foswiki:Extensions/%TOPIC%Dev |
