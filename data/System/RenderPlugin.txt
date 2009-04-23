@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" date="1215778439" format="1.1" reprev="1.2" version="$Rev$"}%
+%META:TOPICINFO{author="ProjectContributor" date="1215778439" format="1.1"  version="$Rev$"}%
 ---+!! %TOPIC%
 <!--
 One line description, required for extensions repository catalog.
@@ -111,7 +111,7 @@ function clearTheMessage() {
 </script>
 
 ---+++ Previewing TML
-<div class="twikiPageForm">
+<div class="foswikiPageForm">
 <form>
 <textarea id="mytext" name="text" rows="5" columns="80" style="width:100%"></textarea>
 
@@ -137,7 +137,6 @@ function preview() {
 Okay, your turn to create an example calling SEARCH.
 
 ---++ Installation Instructions
-
 %$INSTALL_INSTRUCTIONS%
 
 ---++ Plugin Info
@@ -145,13 +144,14 @@ Okay, your turn to create an example calling SEARCH.
 |  Plugin Author: | Michael Daum |
 |  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 1.0 |
+|  Plugin Version: | 2.0 |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  24 Apr 2009: | converted to foswiki plugin |
 |  07 Jan 2009: | added upload rest handler; \
                   fixes for foswiki and <nop>FastCGIContrib |
 |  11 Jul 2008: | initial version |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Plugin Home: | Foswiki:Extensions/%TOPIC% |
-|  Feedback: | Foswiki:Extensions/%TOPIC%Dev |
+|  Support: | Foswiki:Support/%TOPIC% |
 
 %META:FILEATTACHMENT{name="wikiringlogo40x40.png" attachment="wikiringlogo40x40.png" attr="h" comment="" date="1189787359" path="wikiringlogo40x40.png" size="2571" stream="wikiringlogo40x40.png" tmpFilename="" user="ProjectContributor" version="1"}%

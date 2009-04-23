@@ -13,16 +13,16 @@
 # GNU General Public License for more details, published at
 # http://www.gnu.org/copyleft/gpl.html
 
-package TWiki::Plugins::RenderPlugin;
+package Foswiki::Plugins::RenderPlugin;
 
-require TWiki::Func;
-require TWiki::Sandbox;
+require Foswiki::Func;
+require Foswiki::Sandbox;
 use strict;
 
 use vars qw( $VERSION $RELEASE $SHORTDESCRIPTION $NO_PREFS_IN_TOPIC );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.0';
+$RELEASE = '2.0';
 
 $SHORTDESCRIPTION = 'Render <nop>WikiApplications asynchronously';
 $NO_PREFS_IN_TOPIC = 1;
@@ -39,10 +39,10 @@ sub writeDebug {
 sub initPlugin {
   my ($topic, $web, $user, $installWeb) = @_;
 
-  TWiki::Func::registerRESTHandler('tag', \&restTag);
-  TWiki::Func::registerRESTHandler('expand', \&restExpand);
-  TWiki::Func::registerRESTHandler('render', \&restRender);
-  TWiki::Func::registerRESTHandler('upload', \&restUpload);
+  Foswiki::Func::registerRESTHandler('tag', \&restTag);
+  Foswiki::Func::registerRESTHandler('expand', \&restExpand);
+  Foswiki::Func::registerRESTHandler('render', \&restRender);
+  Foswiki::Func::registerRESTHandler('upload', \&restUpload);
 
   return 1;
 }
@@ -51,12 +51,12 @@ sub initPlugin {
 sub restRender {
   my ($session, $subject, $verb) = @_;
 
-  my $query = TWiki::Func::getCgiQuery();
+  my $query = Foswiki::Func::getCgiQuery();
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
-  my ($web, $topic) = TWiki::Func::normalizeWebTopicName($theWeb, $theTopic);
+  my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
 
-  return TWiki::Func::renderText(restExpand($session, $subject, $verb), $web);
+  return Foswiki::Func::renderText(restExpand($session, $subject, $verb), $web);
 }
 
 ###############################################################################
@@ -64,7 +64,7 @@ sub restExpand {
   my ($session, $subject, $verb) = @_;
 
   # get params
-  my $query = TWiki::Func::getCgiQuery();
+  my $query = Foswiki::Func::getCgiQuery();
   my $theText = $query->param('text') || '';
 
   return ' ' unless $theText; # must return at least on char as we get a
@@ -72,10 +72,10 @@ sub restExpand {
                               
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
-  my ($web, $topic) = TWiki::Func::normalizeWebTopicName($theWeb, $theTopic);
+  my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
 
   # and render it
-  return TWiki::Func::expandCommonVariables($theText, $topic, $web) || ' ';
+  return Foswiki::Func::expandCommonVariables($theText, $topic, $web) || ' ';
 }
 
 ###############################################################################
@@ -85,7 +85,7 @@ sub restTag {
   #writeDebug("called restTag($subject, $verb)");
 
   # get params
-  my $query = TWiki::Func::getCgiQuery();
+  my $query = Foswiki::Func::getCgiQuery();
   my $theTag = $query->param('name') || 'INCLUDE';
   my $theDefault = $query->param('param') || '';
   my $theRender = $query->param('render') || 0;
@@ -94,12 +94,12 @@ sub restTag {
 
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
-  my ($web, $topic) = TWiki::Func::normalizeWebTopicName($theWeb, $theTopic);
+  my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
 
   # construct parameters for tag
   my $params = $theDefault?'"'.$theDefault.'"':'';
   foreach my $key ($query->param()) {
-    next if $key =~ /^(name|param|topic|XForms:Model)$/;
+    next if $key =~ /^(name|param|render|topic|XForms:Model)$/;
     my $value = $query->param($key);
     $params .= ' '.$key.'="'.$value.'" ';
   }
@@ -112,9 +112,9 @@ sub restTag {
   #writeDebug("tml=$tml");
 
   # and render it
-  my $result = TWiki::Func::expandCommonVariables($tml, $topic, $web) || ' ';
+  my $result = Foswiki::Func::expandCommonVariables($tml, $topic, $web) || ' ';
   if ($theRender) {
-    $result = TWiki::Func::renderText($result, $web);
+    $result = Foswiki::Func::renderText($result, $web);
   }
 
   #writeDebug("result=$result");
@@ -126,11 +126,11 @@ sub restTag {
 sub restUpload {
   my ($session, $subject, $verb) = @_;
 
-  my $query = TWiki::Func::getCgiQuery();
+  my $query = Foswiki::Func::getCgiQuery();
   my $topic = $query->param('topic');
   my $web;
 
-  ($web, $topic) = TWiki::Func::normalizeWebTopicName("", $topic);
+  ($web, $topic) = Foswiki::Func::normalizeWebTopicName("", $topic);
 
   my $hideFile = $query->param('hidefile') || '';
   my $fileComment = $query->param('filecomment') || '';
@@ -148,8 +148,8 @@ sub restUpload {
   $fileName =~ s/\s*$//o;
   $filePath =~ s/\s*$//o;
 
-  unless (TWiki::Func::checkAccessPermission(
-      'CHANGE', TWiki::Func::getWikiName(), undef, $topic, $web)) {
+  unless (Foswiki::Func::checkAccessPermission(
+      'CHANGE', Foswiki::Func::getWikiName(), undef, $topic, $web)) {
       return "Access denied";
   }
 
@@ -161,7 +161,7 @@ sub restUpload {
   unless($doPropsOnly) {
       # SMELL: call to unpublished function
       ($fileName, $origName) =
-        TWiki::Sandbox::sanitizeAttachmentName($fileName);
+        Foswiki::Sandbox::sanitizeAttachmentName($fileName);
 
       # check if upload has non zero size
       if($stream) {
@@ -174,7 +174,7 @@ sub restUpload {
           return "Zero-sized file upload";
       }
 
-      my $maxSize = TWiki::Func::getPreferencesValue(
+      my $maxSize = Foswiki::Func::getPreferencesValue(
           'ATTACHFILESIZELIMIT');
       $maxSize = 0 unless ($maxSize =~ /([0-9]+)/o);
 
@@ -186,8 +186,8 @@ sub restUpload {
   # SMELL: use of undocumented CGI::tmpFileName
   my $tfp = $query->tmpFileName($query->param('filepath'));
   my $dontlog = $Foswiki::cfg{Log}{upload};
-  $dontlog = $TWiki::cfg{Log}{upload} unless defined $dontlog;
-  my $error = TWiki::Func::saveAttachment(
+  $dontlog = $Foswiki::cfg{Log}{upload} unless defined $dontlog;
+  my $error = Foswiki::Func::saveAttachment(
       $web, $topic, $fileName,
       {
           dontlog => !$dontlog,
