@@ -19,28 +19,28 @@ One line description, required for extensions repository catalog.
 </table>
 This plugin implements three simple REST handlers to get content from Foswiki.
 For example, these can be used to easily replace a server-side INCLUDE with a
-functinal equivalent using an ajax call to one of these REST handlers. 
+functional equivalent using an ajax call to one of these REST handlers. 
 
 This comes in handy to asynchronously load content in a tabbed interface,
-loading subsequent content for a treeview, a menu widget or tooltips.
+loading subsequent content for a treeview, a menu widget, or tooltips.
 
 You may also use it to just render a snippet of <nop>TopicMarkup 
 on the server and return a HTML preview back to the browser.
 
-The REST handlers of this plugin have been designed rather generic.
-So besides some very basic parameter checking, most error handling is up
+The REST handlers of this plugin have been designed to be rather generic.
+So, besides some very basic parameter checking, most error handling is up
 to the callback analysing the return value of the REST handler. The
-main purpose is best described of being an intermediate transport device.
+main purpose is best described as being an intermediate transport device.
 
 Compare this to other plugins that implement more specific REST handlers.
-As such they  are rather tailored to one specific service and thus will be dealing with
+As such, they  are rather tailored to one specific service and thus will be dealing with
 error cases on the server side in much more detail.
 
-The advantage of using this plugin's REST handler is, that you don't have
+The advantage of using this plugin's REST handler is that you don't have
 to implement service backends using perl. Instead, you can write <nop>TopicFunctions
 that contain the <nop>WikiApplication to be executed when it is called by an
 appropriate ajax request. This basically is the client side equivalent of
-a parametrized =INCLUDE= as it is used on server side <nop>WikiApplications (see examples below).
+a parametrized =INCLUDE=, as it is used on server side <nop>WikiApplications (see examples below).
 
 ---++ Syntax
 The available REST handlers are:
@@ -51,9 +51,11 @@ The available REST handlers are:
 | =tag= | =name=, %BR% =param=, %BR% =<named-params>*=, %BR% =render= | this is a convenience function to expand one specific \
   variable instead of having to build up a snippet of code that you want to =expand= or =render=; \
   The =param= parameter specifies the default parameters to this tag; the =named-params= are additional \
-  named parameters; the =render= flag indicates if the result is to be expanded only (see =expand=) \
+  named parameters; the =render= flag indicates if the result is to be expanded only \
   or if it should be renderd into HTML; default is off, that is only expand common tags but don't interpret \
   <nop>TopicMarkup |
+| =template= | =name=, %BR% =expand=, %BR% =render= | this handler loads the template =name= and expands the macro \
+  given in =expand=; the =render= flag indicates whether the result is to be rendered in addition to common tags being interpreted |
 
 ---++ Usage
 The REST handlers are called like this:
@@ -144,8 +146,9 @@ Okay, your turn to create an example calling SEARCH.
 |  Plugin Author: | Michael Daum |
 |  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 2.0 |
+|  Plugin Version: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  12 May 2009: | added =template= handler |
 |  24 Apr 2009: | converted to foswiki plugin |
 |  07 Jan 2009: | added upload rest handler; \
                   fixes for foswiki and <nop>FastCGIContrib |
