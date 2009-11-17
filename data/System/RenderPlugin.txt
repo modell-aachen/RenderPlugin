@@ -146,7 +146,8 @@ Okay, your turn to create an example calling SEARCH.
 |  Plugin Author: | Michael Daum |
 |  Copyright &copy;: | 2006-2009, Michael Daum http://michaeldaumconsulting.com |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | %$RELEASE% |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
 |  12 May 2009: | added =template= handler |
 |  24 Apr 2009: | converted to foswiki plugin |
