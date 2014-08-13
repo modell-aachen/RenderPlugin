@@ -92,6 +92,11 @@ sub restTemplate {
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
+  if (Foswiki::Func::isValidWebName($web)) {
+    $web = Foswiki::Sandbox::untaintUnchecked($web);
+  } else {
+    $web = $Foswiki::cfg{UsersWebName};
+  }
 
   Foswiki::Func::loadTemplate($theTemplate);
 
