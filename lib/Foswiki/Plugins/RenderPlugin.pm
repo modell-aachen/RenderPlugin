@@ -39,10 +39,15 @@ sub writeDebug {
 sub initPlugin {
   my ($topic, $web, $user, $installWeb) = @_;
 
-  Foswiki::Func::registerRESTHandler('tag', \&restTag);
-  Foswiki::Func::registerRESTHandler('template', \&restTemplate);
-  Foswiki::Func::registerRESTHandler('expand', \&restExpand);
-  Foswiki::Func::registerRESTHandler('render', \&restRender);
+  my %restopts = (
+    authenticate => 0,
+    validate => 0,
+    http_allow => 'POST,GET',
+  );
+  Foswiki::Func::registerRESTHandler('tag', \&restTag, %restopts);
+  Foswiki::Func::registerRESTHandler('template', \&restTemplate, %restopts);
+  Foswiki::Func::registerRESTHandler('expand', \&restExpand, %restopts);
+  Foswiki::Func::registerRESTHandler('render', \&restRender, %restopts);
 
   return 1;
 }
