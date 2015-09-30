@@ -54,19 +54,21 @@ sub initPlugin {
 
 ###############################################################################
 sub restRender {
-  my ($session, $subject, $verb) = @_;
+  my ($session, $subject, $verb, $response) = @_;
 
   my $query = Foswiki::Func::getCgiQuery();
   my $theTopic = $query->param('topic') || $session->{topicName};
   my $theWeb = $query->param('web') || $session->{webName};
   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
 
+  cacheHeaders($query, $response);
+
   return Foswiki::Func::renderText(restExpand($session, $subject, $verb), $web);
 }
 
 ###############################################################################
 sub restExpand {
-  my ($session, $subject, $verb) = @_;
+  my ($session, $subject, $verb, $response) = @_;
 
   # get params
   my $query = Foswiki::Func::getCgiQuery();
@@ -79,13 +81,15 @@ sub restExpand {
   my $theWeb = $query->param('web') || $session->{webName};
   my ($web, $topic) = Foswiki::Func::normalizeWebTopicName($theWeb, $theTopic);
 
+  cacheHeaders($query, $response);
+
   # and render it
   return Foswiki::Func::expandCommonVariables($theText, $topic, $web) || ' ';
 }
 
 ###############################################################################
 sub restTemplate {
-  my ($session, $subject, $verb) = @_;
+  my ($session, $subject, $verb, $response) = @_;
 
   my $query = Foswiki::Func::getCgiQuery();
   my $theTemplate = $query->param('name');
@@ -118,12 +122,14 @@ sub restTemplate {
     $result = Foswiki::Func::renderText($result, $web);
   }
 
+  cacheHeaders($query, $response);
+
   return $result;
 }
 
 ###############################################################################
 sub restTag {
-  my ($session, $subject, $verb) = @_;
+  my ($session, $subject, $verb, $response) = @_;
 
   #writeDebug("called restTag($subject, $verb)");
 
@@ -163,7 +169,20 @@ sub restTag {
 
   #writeDebug("result=$result");
 
+  cacheHeaders($query, $response);
+
   return $result;
+}
+
+sub cacheHeaders {
+  my ($query, $response) = @_;
+
+  my $maxAge = $query->param('MaxAge');
+  if(defined $maxAge) {
+    $response->header(
+      '-Cache-Control' => "max-age=$maxAge, private"
+    );
+  }
 }
 
 1;
