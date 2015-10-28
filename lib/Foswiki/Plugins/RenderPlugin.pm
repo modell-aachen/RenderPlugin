@@ -117,7 +117,8 @@ sub restTemplate {
   # and render it
   my $result = Foswiki::Func::expandCommonVariables($tmpl, $topic, $web) || ' ';
 
-  my $theRender = Foswiki::Func::isTrue($query->param('render'),  0);
+  my $theRender = $query->param('render');
+  $theRender = Foswiki::Func::isTrue($theRender,  0);
   if ($theRender) {
     $result = Foswiki::Func::renderText($result, $web);
   }
