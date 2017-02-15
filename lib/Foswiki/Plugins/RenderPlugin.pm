@@ -88,6 +88,18 @@ sub restExpand {
 }
 
 ###############################################################################
+sub _reseti18n {
+    my ( $language ) = @_;
+
+    my $session = $Foswiki::Plugins::SESSION;
+
+    my $currentLanguage = $session->i18n->language();
+    unless ($currentLanguage && $currentLanguage eq $language) {
+        Foswiki::Func::setPreferencesValue( 'LANGUAGE', $language );
+        $Foswiki::Plugins::SESSION->reset_i18n();
+    }
+}
+
 sub restTemplate {
   my ($session, $subject, $verb, $response) = @_;
 
@@ -106,6 +118,9 @@ sub restTemplate {
   } else {
     $web = $Foswiki::cfg{UsersWebName};
   }
+
+  my $newLanguage = $query->param('language');
+  _reseti18n($newLanguage);
 
   Foswiki::Func::loadTemplate($theTemplate);
 
