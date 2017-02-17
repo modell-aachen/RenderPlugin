@@ -93,6 +93,7 @@ sub _reseti18n {
 
     my $session = $Foswiki::Plugins::SESSION;
 
+    return unless $language;
     my $currentLanguage = $session->i18n->language();
     unless ($currentLanguage && $currentLanguage eq $language) {
         Foswiki::Func::setPreferencesValue( 'LANGUAGE', $language );
@@ -120,7 +121,9 @@ sub restTemplate {
   }
 
   my $newLanguage = $query->param('language');
-  _reseti18n($newLanguage);
+  if($newLanguage) {
+      _reseti18n($newLanguage);
+  }
 
   Foswiki::Func::loadTemplate($theTemplate);
 
