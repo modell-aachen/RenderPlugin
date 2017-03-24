@@ -63,6 +63,8 @@ sub restRender {
 
   cacheHeaders($query, $response);
 
+  _reseti18n($query->param('language'));
+
   return Foswiki::Func::renderText(restExpand($session, $subject, $verb), $web);
 }
 
@@ -83,8 +85,24 @@ sub restExpand {
 
   cacheHeaders($query, $response);
 
+  _reseti18n($query->param('language'));
+
   # and render it
   return Foswiki::Func::expandCommonVariables($theText, $topic, $web) || ' ';
+}
+
+###############################################################################
+sub _reseti18n {
+    my ( $language ) = @_;
+
+    my $session = $Foswiki::Plugins::SESSION;
+
+    return unless $language;
+    my $currentLanguage = $session->i18n->language();
+    unless ($currentLanguage && $currentLanguage eq $language) {
+        Foswiki::Func::setPreferencesValue( 'LANGUAGE', $language );
+        $Foswiki::Plugins::SESSION->reset_i18n();
+    }
 }
 
 ###############################################################################
@@ -106,6 +124,8 @@ sub restTemplate {
   } else {
     $web = $Foswiki::cfg{UsersWebName};
   }
+
+  _reseti18n($query->param('language'));
 
   Foswiki::Func::loadTemplate($theTemplate);
 
@@ -161,6 +181,8 @@ sub restTag {
   $tml .= '%';
 
   #writeDebug("tml=$tml");
+
+  _reseti18n($query->param('language'));
 
   # and render it
   my $result = Foswiki::Func::expandCommonVariables($tml, $topic, $web) || ' ';
